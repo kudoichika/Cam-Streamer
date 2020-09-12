@@ -1,4 +1,5 @@
 *.ufd # User Data File
+*.user
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

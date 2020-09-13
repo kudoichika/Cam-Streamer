@@ -1,4 +1,5 @@
 import struct
+import socket
 import time
 import picamera
 

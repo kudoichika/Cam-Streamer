@@ -5,8 +5,8 @@ from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import QLabel, QPushButton, QLineEdit
 from PyQt5.QtWidgets import QHBoxLayout, QVBoxLayout, QCheckBox
 
-class Dialog(QtWidgets.QWidget, parent):
-    def __init__(self):
+class Dialog(QtWidgets.QWidget):
+    def __init__(self, parent):
         QtWidgets.QWidget.__init__(self)
 
         self.parent = parent
@@ -30,7 +30,7 @@ class Dialog(QtWidgets.QWidget, parent):
         connLayout.addWidget(portLabel)
         connLayout.addWidget(self.portText)
 
-        self.checkBox = QCheckBox('Save this configuration to my list')
+        self.checkBox = QCheckBox('Save this configuration to my list for later')
 
         closeButton = QPushButton('Close')
         saveButton = QPushButton('Save')
@@ -51,13 +51,15 @@ class Dialog(QtWidgets.QWidget, parent):
 
     def saveDialog(self):
         if not self.checkBox.isChecked():
-            return
-        if self.parent.dict.has_key(self.nameText.text()):
-            return
+            print("Check Box Not Checked")
+        if self.nameText.text() in self.parent.dict:
+            print("Replacing Key Value")
         self.parent.dict[self.nameText.text()] = {
             'ip': self.connText.text(),
-            'port': self.portText.text()
+            'port': self.portText.text(),
+            'save': self.checkBox.isChecked()
         }
+        self.parent.updateCombos()
         self.closeDialog()
 
     def closeDialog(self):

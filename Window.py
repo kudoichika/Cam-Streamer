@@ -24,7 +24,7 @@ class Window(QtWidgets.QWidget):
         self.combo.setMaximumWidth(700)
 
         self.loadMemory()
-        self.updateCombo()
+        self.updateCombos()
 
         self.addButton = QPushButton('New')
         self.addButton.setMaximumWidth(80)
@@ -63,16 +63,19 @@ class Window(QtWidgets.QWidget):
     def loadMemory(self):
         if os.path.exists('config.ufd'):
             with open('config.ufd', 'r') as file:
-                lines = file.readlines()
-                for i in range(len(lines)/3):
+                lines = file.read().splitlines()
+                for i in range(len(lines)//3):
                     self.dict[lines[3*i]] = {
                         'ip': lines[3*i+1],
-                        'port': lines[3*i+2]
+                        'port': lines[3*i+2],
+                        'save': True
                     }
+        print("Dict", self.dict)
 
     def updateCombos(self):
         self.combo.clear()
         for key in self.dict:
+            print(key)
             self.combo.addItem(key)
 
     def newConfig(self):
@@ -80,7 +83,10 @@ class Window(QtWidgets.QWidget):
         self.d.show()
 
     def connect(self):
-        self.streamer.start_stream(self.label)
+        choice = self.dict[str(self.combo.currentText())]
+        ip = choice['ip']
+        port = int(choice['port'])
+        self.streamer.start_stream(self.label, ip, port)
 
     def disconnect(self):
         self.streamer.close_stream()
@@ -88,9 +94,12 @@ class Window(QtWidgets.QWidget):
     def closeEvent(self, event):
         with open('config.ufd', 'w') as file:
             for key in self.dict:
-                file.write(key)
-                file.write(self.dict[key]['ip'])
-                file.write(self.dict[key]['port'])
+                print(key)
+                if self.dict[key]['save']:
+                    print(key, 'Writing\n')
+                    file.write(key + os.linesep)
+                    file.write(self.dict[key]['ip'] + os.linesep)
+                    file.write(self.dict[key]['port'] + os.linesep)
 
     def __del__(self):
         del self.dict
